@@ -10,8 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 import os
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -36,8 +38,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_rest_framework',
+    # Third party
+    'rest_framework',
+    # Custom
+    'users',
+    'articles',
 ]
+
+AUTH_USER_MODEL = 'users.User'
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
