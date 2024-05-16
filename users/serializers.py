@@ -13,3 +13,24 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)  # 비밀번호 해싱 자동 처리
         return user
+    
+class UserDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "username",
+            "date_joined",
+            "first_name",
+        )
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+    password2 = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = (
+            "password",
+            "password2",
+        )
