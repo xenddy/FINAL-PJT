@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Travel, Camping, Leisure, Cooking
+from .models import Travel, Camping, Leisure, Cooking, Article, Like
 
 class BaseItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,3 +20,17 @@ class LeisureSerializer(BaseItemSerializer):
 class CookingSerializer(BaseItemSerializer):
     class Meta(BaseItemSerializer.Meta):
         model = Cooking
+
+
+class ArticleSerializer(serializers.ModelSerializer):
+    likes_count = serializers.IntegerField(source='likes.count', read_only=True)
+
+    class Meta:
+        model = Article
+        fields = ['id', 'title', 'content', 'created_at', 'likes_count']
+
+class LikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Like
+        fields = ('id', 'user', 'article', 'created_at')
+
