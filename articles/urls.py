@@ -12,4 +12,5 @@ urlpatterns = [
     path('Leisure/<int:pk>/', views.LeisureDetail.as_view(), name='Leisure_detail'),
     path('Cooking/', views.CookingList.as_view(), name='Cooking_list'),
     path('Cooking/<int:pk>/', views.CookingDetail.as_view(), name='Cooking_detail'),
+
 ]
