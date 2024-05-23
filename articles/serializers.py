@@ -1,42 +1,38 @@
 from rest_framework import serializers
-from .models import Travel, Camping, Leisure, Cooking, Article, Like, Comments
+from .models import Article, Comment
+from django.contrib.auth import get_user_model
+# Create your models here.
+User = get_user_model()
 
-class BaseItemSerializer(serializers.ModelSerializer):
+class CommentSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
     class Meta:
-        fields = ['id', 'title', 'content', 'created_at']
+        model = Comment
+        fields = ["content", "created_at", "updated_at", "user"]
 
-class TravelSerializer(BaseItemSerializer):
-    class Meta(BaseItemSerializer.Meta):
-        model = Travel
+    def get_user(self, obj):
+        return obj.user.username
 
-class CampingSerializer(BaseItemSerializer):
-    class Meta(BaseItemSerializer.Meta):
-        model = Camping
+    def create(self, validated_data):
+        article_pk = self.context.get('view').kwargs.get('article_pk')
+        article = Article.objects.get(id=article_pk)
+        validated_data['article'] = article
+        return super().create(validated_data)
 
-class LeisureSerializer(BaseItemSerializer):
-    class Meta(BaseItemSerializer.Meta):
-        model = Leisure
-
-class CookingSerializer(BaseItemSerializer):
-    class Meta(BaseItemSerializer.Meta):
-        model = Cooking
-
-class CommentsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Comments
-        fields = ['id', 'content', ]
 
 
 class ArticleSerializer(serializers.ModelSerializer):
     likes_count = serializers.IntegerField(source='likes.count', read_only=True)
-
+    author = serializers.ReadOnlyField(source='author.username')
     class Meta:
         model = Article
-        fields = ['id', 'title', 'content', 'created_at', 'likes_count']
+        fields = ['id', 'title', 'content', 'created_at', 'likes_count','category','author']
+        extra_kwargs = {
+            'author':{'read_only': True}
+        }
 
-class LikeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Like
-        fields = ('id', 'user', 'article', 'created_at')
-
+    def create(self, validated_data):
+        validated_data['author'] = self.context['request'].user
+        return super().create(validated_data)
 

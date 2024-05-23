@@ -7,10 +7,11 @@ from .serializers import (
     UserDetailSerializer,
     UserUpdateSerializer,
 )
+from .models import User
 
 class UserSignupView(APIView):
     def post(self, request):
-        serializer = CustomUserSerializer(data=request.data)
+        serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -18,11 +19,11 @@ class UserSignupView(APIView):
 
 class UserDetailAPIView(APIView):
     def get_object(self, username):
-        return get_object_or_404(CustomUser, username=username)
+        return get_object_or_404(User, username=username)
 
     def get(self, request, username):
         user = self.get_object(username)
-        serializer = CustomUserDetailSerializer(user)
+        serializer = UserDetailSerializer(user)
         return Response(serializer.data)
 
     def put(self, request, username):
@@ -35,12 +36,12 @@ class UserDetailAPIView(APIView):
             )
 
         user = self.get_object(username)
-        serializer = CustomUserDetailSerializer(user, data=request.data, partial=True)
+        serializer = UserDetailSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             user = serializer.save()
             if password:
                 user.set_password(password)
                 user.save()
-            serializer = CustomUserUpdateSerializer(user)
+            serializer = UserUpdateSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
