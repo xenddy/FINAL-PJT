@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import User, Follow
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -34,3 +34,13 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             "password",
             "password2",
         )
+
+
+class FollowSerializer(serializers.ModelSerializer):
+    follower = serializers.SlugRelatedField(slug_field='username', queryset=User.objects.all())
+    following = serializers.SlugRelatedField(slug_field='username', queryset=User.objects.all())
+
+    class Meta:
+        model = Follow
+        fields = ['id', 'follower', 'following', 'created_at']
+        read_only_fields = ['id', 'created_at']
