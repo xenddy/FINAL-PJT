@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Travel, Camping, Leisure, Cooking
+from .models import Travel, Camping, Leisure, Cooking, Comments
 
 class BaseItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,3 +20,8 @@ class LeisureSerializer(BaseItemSerializer):
 class CookingSerializer(BaseItemSerializer):
     class Meta(BaseItemSerializer.Meta):
         model = Cooking
+
+class CommentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comments
+        fields = ['id', 'content', ]
