@@ -18,7 +18,7 @@
 
 🧑‍🤝‍🧑 Development Team: Team-4
 - 이한별 :
-- 김예은 :
+- 김예은 : 좋아요 및 팔로우 기능 구현
 - 정윤기 :
 - 진성길 :
 
@@ -52,9 +52,12 @@
 ---
 
 📝 Project Architecture
-S.A. 노션 : https://www.notion.so/4-S-A-6ffaa44bbef34eff908b8180a7e25ccc
+- S.A. 노션 : https://www.notion.so/4-S-A-6ffaa44bbef34eff908b8180a7e25ccc
 
-시연영상 : 아직없음
+### ERD
+![onealog](https://teamsparta.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F83c75a39-3aba-4ba4-a792-7aefe4b07895%2F31273314-d745-414f-8455-fa4a17a52701%2FUntitled.png?table=block&id=5e722b2a-8d40-40ef-bf27-1ef5db20ed56&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=2000&userId=&cache=v2)   
+
+- 시연영상 : 아직없음
 
 ---
 
