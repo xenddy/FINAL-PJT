@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     # Custom
     'users',
-    'rest_framework',
     'articles',
 ]
 
@@ -60,7 +59,7 @@ REST_FRAMEWORK = {
 REST_USE_JWT = True
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5000),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
