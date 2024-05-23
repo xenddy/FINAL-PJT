@@ -1,6 +1,12 @@
 from django.urls import path
 from . import views
-
+from .views import (
+    TravelList, TravelDetail,
+    CampingList, CampingDetail,
+    LeisureList, LeisureDetail,
+    CookingList, CookingDetail,
+    LikeCreate, LikeDelete
+)
 
 urlpatterns = [
     # 게시글 등록,수정,삭제
@@ -13,5 +19,8 @@ urlpatterns = [
     path('Cooking/', views.CookingList.as_view(), name='Cooking_list'),
     path('Cooking/<int:pk>/', views.CookingDetail.as_view(), name='Cooking_detail'),
     path('comments/<str:model_name>/<int:object_id>/', views.CommentsCreate.as_view(), name='comments-create'),
+    #좋아요
+    path('like/', LikeCreate.as_view(), name='like-create'),
+    path('like/<int:pk>/', LikeDelete.as_view(), name='like-delete'),
 
 ]
