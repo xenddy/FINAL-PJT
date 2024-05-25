@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     # Custom
     'users',
     'articles',
+    'chatgpt',
 ]
 
 AUTH_USER_MODEL = 'users.User'
