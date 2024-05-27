@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .models import Comment,Article,Like
 from rest_framework.views import APIView
-from django.contrib.contenttypes.models import ContentType
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import (
     CommentSerializer,ArticleSerializer,
@@ -58,47 +57,35 @@ class CookingDetail(BaseDetailView):
 
 
 class CommentGetPost(APIView):
-    def get(self, request, Article_pk):
-        Article = Article.objects.get(id=Article_pk)
-        comments = Article.comments.all()
+    def get(self, request, pk):
+        article = get_object_or_404(Article, pk=pk)
+        comments = article.comments.all()
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
-    def post(self, request,Article_pk):
-        Article = Article.objects.get(id=Article_pk)
-        if not request.user.is_authenticated:
-            return Response(
-                {"error": "인증이 필요합니다."}, status=status.HTTP_401_UNAUTHORIZED
-            )
-        serializer = CommentSerializer(data=request.data, context={"view": self})
-        if serializer.is_valid(raise_exception=True):
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    def post(self, request, pk):
+        article = get_object_or_404(Article, pk=pk)
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(article=article)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
 class CommentPutDelete(APIView):
-    permission_classes = [IsAuthenticated]
     def get_object(self, comment_pk):
         return get_object_or_404(Comment, pk=comment_pk)
+
     def put(self, request, comment_pk):
         comment = self.get_object(comment_pk)
-        if comment.user != request.user and not request.user.is_superuser:
-            return Response(
-                {"error": "작성자만 수정할 수 있습니다."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-        serializer = CommentSerializer(comment, data=request.data)
+        serializer = CommentSerializer(comment, data=request.data, partial=True)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data)
+        
     def delete(self, request, comment_pk):
         comment = self.get_object(comment_pk)
-        if comment.user != request.user and not request.user.is_superuser:
-            return Response(
-                {"error": "작성자만 삭제할 수 있습니다."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
         comment.delete()
-        data = {"delete": f"댓글 ({comment_pk})번이 삭제되었습니다."}
-        return Response(data, status=status.HTTP_204_NO_CONTENT)
+        data = {"pk": "댓글이 삭제 되었습니다"}
+        return Response(data, status=status.HTTP_200_OK)
 
 class LikeCreate(generics.CreateAPIView):
     serializer_class = ArticleSerializer
