@@ -1,13 +1,15 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import (
     UserSerializer,
     UserDetailSerializer,
     UserUpdateSerializer,
+    FollowSerializer,
 )
-from .models import User
+from .models import Follow, User
+from rest_framework.permissions import IsAuthenticated
 
 class UserSignupView(APIView):
     def post(self, request):
@@ -45,3 +47,23 @@ class UserDetailAPIView(APIView):
             serializer = UserUpdateSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FollowToggleViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        follower = request.user
+        username = kwargs.get('username')
+        following = get_object_or_404(User, username=username)
+        
+        if follower == following:
+            return Response({'detail': 'You cannot follow yourself.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        follow, created = Follow.objects.get_or_create(follower=follower, following=following)
+        
+        if not created:
+            follow.delete()
+            return Response({'detail': 'Unfollowed successfully.'}, status=status.HTTP_204_NO_CONTENT)
+        
+        return Response({'detail': 'Followed successfully.'}, status=status.HTTP_201_CREATED)

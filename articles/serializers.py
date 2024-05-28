@@ -4,22 +4,12 @@ from django.contrib.auth import get_user_model
 # Create your models here.
 User = get_user_model()
 
-class CommentSerializer(serializers.ModelSerializer):
-    user = serializers.SerializerMethodField()
 
+class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ["content", "created_at", "updated_at", "user"]
-
-    def get_user(self, obj):
-        return obj.user.username
-
-    def create(self, validated_data):
-        article_pk = self.context.get('view').kwargs.get('article_pk')
-        article = Article.objects.get(id=article_pk)
-        validated_data['article'] = article
-        return super().create(validated_data)
-
+        fields = "__all__"
+        read_only_fields = ("article",)
 
 
 class ArticleSerializer(serializers.ModelSerializer):
