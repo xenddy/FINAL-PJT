@@ -1,6 +1,7 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from rest_framework import status, viewsets
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from rest_framework.views import APIView
 from .serializers import (
     UserSerializer,
@@ -10,6 +11,10 @@ from .serializers import (
 )
 from .models import Follow, User
 from rest_framework.permissions import IsAuthenticated
+
+
+
+
 
 class UserSignupView(APIView):
     def post(self, request):
@@ -64,6 +69,10 @@ class FollowToggleViewSet(viewsets.ViewSet):
         
         if not created:
             follow.delete()
-            return Response({'detail': 'Unfollowed successfully.'}, status=status.HTTP_204_NO_CONTENT)
+            return Response({'detail': 'Unfollowed successfully.'}, status=status.HTTP_200_OK)
         
         return Response({'detail': 'Followed successfully.'}, status=status.HTTP_201_CREATED)
+
+
+
+
