@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modify Article</title>
+</head>
+<body>
+    <h1>Modify Article</h1>
+    <form action="{% url 'articles:Travel_update' pk=article.id %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="_method" value="put"> <!-- PUT 메서드를 지정하기 위한 hidden input -->
+        <label for="title">Title:</label><br>
+        <input type="text" id="title" name="title" value="{{ article.title }}"><br>
+        <label for="content">Content:</label><br>
+        <textarea id="content" name="content">{{ article.content }}</textarea><br>
+        <input type="submit" value="Save">
+    </form>
+</body>
+</html>

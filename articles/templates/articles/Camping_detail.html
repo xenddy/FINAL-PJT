@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camping Detail</title>
+</head>
+<body>
+    <h1>캠핑 게시물 세부 정보</h1>
+    <div>
+        <h2>제목: {{ article.title }}</h2>
+        <p>내용: {{ article.content }}</p>
+        <p>작성자: {{ article.author }}</p>
+        <p>날짜: {{ article.created_at }}</p>
+        <!-- 추가적인 정보들을 필요에 따라 표시 -->
+    </div>
+
+    <!-- 댓글 섹션 -->
+    <h2>댓글</h2>
+    <ul>
+        {% for comment in comments %}
+            <li>
+                <p>{{ comment.content }}</p>
+                <p>작성자: {{ comment.user }}</p>
+                <p>작성일자: {{ comment.created_at }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <button onclick="goBack()">목록 보기</button>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>

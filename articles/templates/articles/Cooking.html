@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cooking Articles</title>
+</head>
+<body>
+    <h1>요리 게시판</h1>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+            </tr>
+        </thead>
+        <tbody id="articles-container">
+            {% for article in articles %}
+            <tr>
+                <td><a href="{% url 'articles:Cooking_detail' article.id %}">{{ article.title }}</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- 새 글 작성 버튼 -->
+    <button id="new-post-btn">새 글 작성</button>
+    
+    <!-- Load JavaScript file -->
+    <script src="{% static 'articles/js/fetch_Cooking.js' %}"></script>
+    <script>
+        document.getElementById("new-post-btn").addEventListener("click", function() {
+            // 새 글 작성 페이지로 이동
+            window.location.href = "{% url 'articles:newlist' %}";
+        });
+    </script>
+</body>
+</html>
