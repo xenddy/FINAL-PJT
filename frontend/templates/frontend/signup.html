@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="{% static 'frontend/js/signup.js' %}" defer></script>
+    <script>window.CSRF_TOKEN = "{{ csrf_token }}";</script>
+</head>
+<body>
+    <h1>Signup</h1>
+    <form id="signup-form">
+        <label for="username">아이디:</label>
+        <input type="text" id="username" name="username" required><br><br>
+        <label for="password">비밀번호:</label>
+        <input type="password" id="password" name="password" required><br><br>
+        <label for="first_name">이름:</label>
+        <input type="text" id="first_name" name="first_name"><br><br>
+        <button type="submit">Signup</button>
+    </form>
+</body>
+</html>

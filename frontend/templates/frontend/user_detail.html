@@ -1,0 +1,32 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Detail</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="{% static 'frontend/js/user_detail.js' %}" defer></script>
+    <script src="{% static 'frontend/js/logout.js' %}" defer></script>
+    <script src="{% static 'frontend/js/follow.js' %}" defer></script>
+</head>
+<body>
+    <h1>User Detail</h1>
+    <h2>{{ username }}</h2>
+    <div id="user-detail">
+        <p>Username: <span id="username"></span></p>
+        <p>First Name: <span id="first-name"></span></p>
+        <p>Date Joined: <span id="date-joined"></span></p>
+    </div>
+    <div>
+        <button id="logout-button">로그아웃</button>
+        <button id="edit-button">회원수정</button>
+    </div>
+
+    <div id="username" style="display: none;">your-username</div>
+    <div id="follow-button-container">
+        <button id="follow-button">팔로우</button>
+    </div>
+    
+    
+</html>

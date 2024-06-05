@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .models import Comment,Article,Like
 from rest_framework.views import APIView
-from django.contrib.contenttypes.models import ContentType
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import (
     CommentSerializer,ArticleSerializer,
@@ -185,6 +184,13 @@ class CommentGetPost(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def post(self, request, pk):
+        article = get_object_or_404(Article, pk=pk)
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(article=article)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
 class CommentPutDelete(APIView):
     def get_object(self, comment_pk):
         return get_object_or_404(Comment, pk=comment_pk)
