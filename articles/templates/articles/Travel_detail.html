@@ -38,6 +38,7 @@
             padding-bottom: 15px;
             display: flex;
             justify-content: space-between;
+            position: relative;
         }
         li:last-child {
             border-bottom: none;
@@ -56,6 +57,18 @@
         }
         button:hover {
             background-color: #0056b3;
+        }
+        .comment-button {
+            background-color: transparent;
+            color: #666;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 3px 6px;
+            margin-left: 5px;
+        }
+        .comment-button:hover {
+            color: #333;
         }
         .modal {
             display: none;
@@ -92,6 +105,14 @@
             text-decoration: none;
             cursor: pointer;
         }
+        textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: vertical;
+        }
     </style>
     {% load static %}
 </head>
@@ -103,15 +124,21 @@
             <p id="article-content">내용: {{ article.content }}</p>
             <p>작성자: <span id="article-author">{{ article.author }}</span></p>
             <p>날짜: <span id="article-created-at">{{ article.created_at }}</span></p>
-            <!-- 추가적인 정보들을 필요에 따라 표시 -->
         </div>
+        <button id="deleteButton">삭제</button>
+        <button id="editButton">수정</button>
+        <button onclick="goBack()">목록 보기</button>
         <br><br>
-        <!-- 댓글 섹션 -->
+        <div>
+            <h3>댓글 작성</h3>
+            <textarea id="new-comment" placeholder="댓글을 입력하세요..."></textarea>
+            <button id="submitCommentButton">댓글 작성</button>
+        </div>
         <div>
             <h2>댓글</h2>
             <ul id="commentList">
                 {% for comment in comments %}
-                    <li>
+                    <li data-comment-id="{{ comment.id }}">
                         <div class="comment-content">
                             <p>{{ comment.content }}</p>
                         </div>
@@ -119,18 +146,18 @@
                             <p>작성자: {{ comment.user }}</p>
                             <p>작성일자: {{ comment.created_at }}</p>
                         </div>
+                        <div>
+                            <button class="comment-button edit-comment-button">수정</button>
+                            <button class="comment-button delete-comment-button">삭제</button>
+                        </div>
                     </li>
                 {% empty %}
                     <li>댓글이 없습니다.</li>
                 {% endfor %}
             </ul>
         </div>
-        <button id="deleteButton">삭제</button>
-        <button id="editButton">수정</button>
-        <button onclick="goBack()">목록 보기</button>
     </div>
 
-    <!-- 수정 모달 -->
     <div id="edit-article-modal" class="modal">
         <div class="modal-content">
             <span class="close" id="closeModal">&times;</span>
@@ -143,26 +170,20 @@
         </div>
     </div>
 
+    <div id="edit-comment-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeCommentModal">&times;</span>
+            <h2>댓글 수정</h2>
+            <label for="edit-comment-content">내용:</label>
+            <textarea id="edit-comment-content" name="content"></textarea>
+            <button id="saveCommentEditButton">저장</button>
+        </div>
+    </div>
+
     <script src="{% static 'articles/js/fetch_Travel_detail.js' %}"></script>
     <script>
         function goBack() {
             window.history.back();
-        }
-
-        document.getElementById('editButton').addEventListener('click', function() {
-            document.getElementById('edit-article-modal').style.display = 'block';
-            document.getElementById('edit-title').value = document.getElementById('article-title').innerText.replace('제목: ', '');
-            document.getElementById('edit-content').value = document.getElementById('article-content').innerText.replace('내용: ', '');
-        });
-
-        document.getElementById('closeModal').addEventListener('click', function() {
-            document.getElementById('edit-article-modal').style.display = 'none';
-        });
-
-        window.onclick = function(event) {
-            if (event.target == document.getElementById('edit-article-modal')) {
-                document.getElementById('edit-article-modal').style.display = 'none';
-            }
         }
     </script>
 </body>

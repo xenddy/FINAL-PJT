@@ -24,7 +24,7 @@
             float: right;
         }
         nav li {
-            display: inline-block; /* 가로로 배치되도록 설정 */
+            display: inline-block;
         }
         nav li a {
             display: block;
@@ -114,13 +114,10 @@
             {% endfor %}
         </tbody>
     </table>
-    <!-- 새 글 작성 버튼 -->
     <button id="new-post-btn">새 글 작성</button>
-    <!-- Load JavaScript file -->
     <script src="{% static 'articles/js/fetch_Camping.js' %}"></script>
     <script>
         document.getElementById("new-post-btn").addEventListener("click", function() {
-            // 새 글 작성 페이지로 이동
             window.location.href = "{% url 'articles:newlist' %}";
         });
     </script>

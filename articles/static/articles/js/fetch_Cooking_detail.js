@@ -16,12 +16,12 @@ function getCookie(name) {
 }
 
 window.onload = async function() {
-    const articleId = window.location.pathname.split('/').filter(Boolean).pop(); // URL에서 article ID 추출
+    const articleId = window.location.pathname.split('/').filter(Boolean).pop();
 
     try {
         const [articleResponse, commentsResponse] = await Promise.all([
             fetch(`${BASE_URL}api/articles/Cooking/${articleId}/`),
-            fetch(`${BASE_URL}api/articles/Cooking/${articleId}/comments/`)
+            fetch(`${BASE_URL}api/articles/${articleId}/comments/`)
         ]);
 
         if (!articleResponse.ok) {
@@ -38,7 +38,7 @@ window.onload = async function() {
         ]);
 
         renderArticleDetail(article);
-        renderCommentsHTML(comments); // 댓글을 HTML로 렌더링
+        renderCommentsHTML(comments);
     } catch (error) {
         console.error('Error fetching data:', error);
     }
@@ -49,13 +49,13 @@ window.onload = async function() {
             const confirmDelete = confirm('정말로 이 게시글을 삭제하시겠습니까?');
             if (confirmDelete) {
                 try {
-                    const csrftoken = getCookie('csrftoken'); // CSRF 토큰 가져오기
+                    const csrftoken = getCookie('csrftoken');
                     const response = await fetch(`${BASE_URL}api/articles/Cooking/${articleId}/`, {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json',
                             'X-CSRFToken': csrftoken,
-                            'Authorization': 'Bearer ' + localStorage.getItem('access_token') // JWT 토큰 포함
+                            'Authorization': 'Bearer ' + localStorage.getItem('access_token')
                         }
                     });
 
@@ -66,7 +66,6 @@ window.onload = async function() {
                             throw new Error(`Failed to delete article: ${response.statusText}`);
                         }
                     } else {
-                        // 삭제 후 캠핑 리스트 페이지로 이동
                         window.location.href = '/api/articles/Cooking/';
                     }
 
@@ -79,6 +78,7 @@ window.onload = async function() {
     } else {
         console.error('Delete button not found');
     }
+
     const editButton = document.getElementById('editButton');
     if (editButton) {
         editButton.addEventListener('click', () => {
@@ -125,41 +125,127 @@ window.onload = async function() {
 
             } catch (error) {
                 console.error('Error updating article:', error);
-                alert('게시글 수정 권한이 없습니다.');
+                alert('게시글 수정 중 오류가 발생했습니다. 다시 시도해주세요.');
             }
         });
     }
-};
 
-function renderArticleDetail(article) {
-    document.getElementById("article-title").innerText = article.title;
-    document.getElementById("article-content").innerText = article.content;
-    document.getElementById("article-author").innerText = article.author;
-    document.getElementById("article-created-at").innerText = article.created_at;
-}
+    document.getElementById('submitCommentButton').addEventListener('click', async function() {
+        const commentContent = document.getElementById('new-comment').value;
+        if (commentContent.trim() === "") {
+            alert("댓글을 입력하세요.");
+            return;
+        }
 
-function renderCommentsHTML(comments) {
-    const commentList = document.getElementById("commentList");
-    commentList.innerHTML = "";
+        try {
+            const csrftoken = getCookie('csrftoken');
+            const response = await fetch(`${BASE_URL}api/articles/${articleId}/comments/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                    'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                },
+                body: JSON.stringify({ content: commentContent })
+            });
 
-    if (comments.length > 0) {
-        comments.forEach(comment => {
-            commentList.innerHTML += renderCommentHTML(comment);
-        });
-    } else {
-        const li = document.createElement('li');
-        li.textContent = "댓글이 없습니다.";
-        commentList.appendChild(li);
-    }
-}
+            if (!response.ok) {
+                throw new Error(`Failed to post comment: ${response.statusText}`);
+            }
 
-// Comment 데이터를 HTML로 변환하는 함수
-function renderCommentHTML(comment) {
-    return `
-        <li>
-            <p>${comment.content}</p>
-            <p>작성자: ${comment.user.username}</p>
-            <p>작성일자: ${comment.created_at}</p>
-        </li>
-    `;
+            const newComment = await response.json();
+            document.getElementById('commentList').innerHTML += `
+                <li data-comment-id="${newComment.id}">
+                    <div class="comment-content">
+                        <p>${newComment.content}</p>
+                    </div>
+                    <div class="comment-details">
+                        <p>작성자: ${newComment.user.username}</p>
+                        <p>작성일자: ${newComment.created_at}</p>
+                    </div>
+                    <div>
+                        <button class="comment-button edit-comment-button">수정</button>
+                        <button class="comment-button delete-comment-button">삭제</button>
+                    </div>
+                </li>
+            `;
+
+            document.getElementById('new-comment').value = '';
+
+        } catch (error) {
+            console.error('Error posting comment:', error);
+            alert('댓글 작성 중 오류가 발생했습니다. 다시 시도해주세요.');
+        }
+    });
+
+    document.addEventListener('click', async function(event) {
+        if (event.target.classList.contains('delete-comment-button')) {
+            const commentId = event.target.closest('li').dataset.commentId;
+
+            try {
+                const csrftoken = getCookie('csrftoken');
+                const response = await fetch(`${BASE_URL}api/articles/comments/${commentId}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken,
+                        'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to delete comment: ${response.statusText}`);
+                }
+
+                event.target.closest('li').remove();
+
+            } catch (error) {
+                console.error('Error deleting comment:', error);
+                alert('댓글 삭제 중 오류가 발생했습니다. 다시 시도해주세요.');
+            }
+        }
+
+        if (event.target.classList.contains('edit-comment-button')) {
+            const commentId = event.target.closest('li').dataset.commentId;
+            const commentContent = event.target.closest('li').querySelector('.comment-content p').innerText;
+
+            document.getElementById('edit-comment-content').value = commentContent;
+            document.getElementById('saveCommentEditButton').dataset.commentId = commentId;
+            document.getElementById('edit-comment-modal').style.display = 'block';
+        }
+    });
+
+    document.getElementById('saveCommentEditButton').addEventListener('click', async function() {
+        const commentId = this.dataset.commentId;
+        const updatedContent = document.getElementById('edit-comment-content').value;
+
+        try {
+            const csrftoken = getCookie('csrftoken');
+            const response = await fetch(`${BASE_URL}api/articles/comments/${commentId}/`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                    'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                },
+                body: JSON.stringify({ content: updatedContent })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Error response:', errorText);
+                throw new Error(`Failed to update comment: ${response.statusText}`);
+            }
+
+            const updatedComment = await response.json();
+            const commentElement = document.querySelector(`li[data-comment-id='${commentId}'] .comment-content p`);
+            commentElement.innerText = updatedComment.content;
+
+            document.getElementById('edit-comment-modal').style.display = 'none';
+
+        } catch (error) {
+            console.error('Error updating comment:', error);
+            alert('댓글 수정 중 오류가 발생했습니다. 다시 시도해주세요.');
+        }
+    });
 }

@@ -106,8 +106,7 @@ class CampingList(BaseListView):
 
     def get(self, request, *args, **kwargs):
         articles = Article.objects.filter(category='Camping')
-        serializer = ArticleSerializer(articles, many=True)
-        return render(request, 'Camping.html', {'articles': serializer.data})
+        return render(request, 'Camping.html', {'articles': articles})
 
     def post(self, request, *args, **kwargs):
         serializer = ArticleSerializer(data=request.data)
@@ -288,14 +287,14 @@ class CookingDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class CommentGetPost(APIView):
-    def get(self, request, article_id):  # article_id로 수정
-        article = get_object_or_404(Article, pk=article_id)  # pk 대신 article_id 사용
+    def get(self, request, article_id):
+        article = get_object_or_404(Article, pk=article_id)
         comments = article.comments.all()
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
 
-    def post(self, request, article_id):  # article_id로 수정
-        article = get_object_or_404(Article, pk=article_id)  # pk 대신 article_id 사용
+    def post(self, request, article_id):
+        article = get_object_or_404(Article, pk=article_id)
         serializer = CommentSerializer(data=request.data, context={'article': article, 'request': request})
         if serializer.is_valid(raise_exception=True):
             serializer.save()
