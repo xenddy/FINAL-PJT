@@ -1,20 +1,42 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>로그인</title>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" defer ></script>
-    <script src="{% static 'frontend/js/login.js' %}" defer></script>
+    <title>Login</title>
+    {% load static %}
+    <script>
+        async function handleLogin(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+            });
+            const data = await response.json();
+            if (response.ok) {
+                localStorage.setItem('access_token', data.access);
+                localStorage.setItem('refresh_token', data.refresh);
+                window.location.href = response.headers.get('Location');
+            } else {
+                alert('로그인 실패: ' + data.detail);
+            }
+        }
+    </script>
 </head>
 <body>
-    <form id = "login-form">
-        <label for="username">ID</label>
-        <input type="text" name="username" id="username">
-        <label for="password">PW</label>
-        <input type="password" name="password" id="password">
-        <input type="submit" value="login">
+    <h2>Login</h2>
+    <form method="post" onsubmit="handleLogin(event)">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Login</button>
     </form>
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
 </body>
 </html>

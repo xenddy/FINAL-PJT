@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 import os
-from . import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -24,8 +23,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 
 
-SECRET_KEY = config.DJANGO_SECRET_KEY
-OPENAI_API_KEY = config.OPENAI_API_KEY
+SECRET_KEY = 'django-insecure-4+99yz^bz5=+qcv+(bn4!h+&kku=7^(@l=37yr_#$j_h^6c_hv'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -171,3 +170,5 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "http://127.0.0.1:8000",
 ]
+
+CSRF_COOKIE_NAME = "csrftoken"

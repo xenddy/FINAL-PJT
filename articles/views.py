@@ -17,7 +17,6 @@ class BaseListView(generics.ListCreateAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
         serializer.save(author=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -27,8 +26,19 @@ class BaseDetailView(generics.RetrieveUpdateDestroyAPIView):
     def perform_update(self, serializer):
         serializer.save(author=self.request.user)
 
+    def perform_update(self, serializer):
+        serializer.save(author=self.request.user)
+
 class TravelList(BaseListView):
-    permission_classes = [AllowAny]  # 모든 요청을 허용
+    queryset = Article.objects.filter(category='Travel')
+    serializer_class = ArticleSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            self.permission_classes = [IsAuthenticated]
+        else:
+            self.permission_classes = [AllowAny]
+        return super().get_permissions()
 
     def get(self, request, *args, **kwargs):
         articles = Article.objects.filter(category='Travel')
@@ -40,7 +50,7 @@ class TravelList(BaseListView):
         if serializer.is_valid():
             serializer.save(author=request.user)
             new_article_id = serializer.data.get('id')
-            return redirect('articles:Travel_detail', pk=new_article_id)  # 여기에서 패턴 이름을 수정
+            return redirect('articles:Travel_detail', pk=new_article_id)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     @classmethod
@@ -50,21 +60,49 @@ class TravelList(BaseListView):
 class TravelDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Article.objects.filter(category='Travel')
     serializer_class = ArticleSerializer
-    permission_classes = [AllowAny]
     lookup_field = 'pk'
+
+    def get_permissions(self):
+        if self.request.method == 'DELETE':
+            self.permission_classes = [IsAuthenticated]
+        else:
+            self.permission_classes = [AllowAny]
+        return super().get_permissions()
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.author != request.user:
+            return Response({'detail': 'Permission denied. You can only delete your own articles.'}, status=status.HTTP_403_FORBIDDEN)
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-
-        # 댓글을 가져오는 부분 추가
         comments = instance.comments.all()
         comment_serializer = CommentSerializer(comments, many=True)
-
         return render(request, 'Travel_detail.html', {'article': serializer.data, 'comments': comment_serializer.data})
+    
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.author != request.user:
+            return Response({'detail': 'Permission denied. You can only update your own articles.'}, status=status.HTTP_403_FORBIDDEN)
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CampingList(BaseListView):
-    permission_classes = [AllowAny]  # 모든 요청을 허용
+    queryset = Article.objects.filter(category='Camping')
+    serializer_class = ArticleSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            self.permission_classes = [IsAuthenticated]
+        else:
+            self.permission_classes = [AllowAny]
+        return super().get_permissions()
 
     def get(self, request, *args, **kwargs):
         articles = Article.objects.filter(category='Camping')
@@ -76,7 +114,7 @@ class CampingList(BaseListView):
         if serializer.is_valid():
             serializer.save(author=request.user)
             new_article_id = serializer.data.get('id')
-            return redirect('articles:Camping_detail', pk=new_article_id)  # 여기에서 패턴 이름을 수정
+            return redirect('articles:Camping_detail', pk=new_article_id)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     @classmethod
@@ -86,26 +124,49 @@ class CampingList(BaseListView):
 class CampingDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Article.objects.filter(category='Camping')
     serializer_class = ArticleSerializer
-    permission_classes = [AllowAny]
     lookup_field = 'pk'
+
+    def get_permissions(self):
+        if self.request.method == 'DELETE':
+            self.permission_classes = [IsAuthenticated]
+        else:
+            self.permission_classes = [AllowAny]
+        return super().get_permissions()
 
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
+        if instance.author != request.user:
+            return Response({'detail': 'Permission denied. You can only delete your own articles.'}, status=status.HTTP_403_FORBIDDEN)
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-
-        # 댓글을 가져오는 부분 추가
         comments = instance.comments.all()
         comment_serializer = CommentSerializer(comments, many=True)
-
         return render(request, 'Camping_detail.html', {'article': serializer.data, 'comments': comment_serializer.data})
+    
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.author != request.user:
+            return Response({'detail': 'Permission denied. You can only update your own articles.'}, status=status.HTTP_403_FORBIDDEN)
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LeisureList(BaseListView):
-    permission_classes = [AllowAny]  # 모든 요청을 허용
+    queryset = Article.objects.filter(category='Leisure')
+    serializer_class = ArticleSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            self.permission_classes = [IsAuthenticated]
+        else:
+            self.permission_classes = [AllowAny]
+        return super().get_permissions()
 
     def get(self, request, *args, **kwargs):
         articles = Article.objects.filter(category='Leisure')
@@ -117,7 +178,7 @@ class LeisureList(BaseListView):
         if serializer.is_valid():
             serializer.save(author=request.user)
             new_article_id = serializer.data.get('id')
-            return redirect('articles:Leisure_detail', pk=new_article_id)  # 여기에서 패턴 이름을 수정
+            return redirect('articles:Leisure_detail', pk=new_article_id)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     @classmethod
@@ -127,21 +188,49 @@ class LeisureList(BaseListView):
 class LeisureDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Article.objects.filter(category='Leisure')
     serializer_class = ArticleSerializer
-    permission_classes = [AllowAny]
     lookup_field = 'pk'
+
+    def get_permissions(self):
+        if self.request.method == 'DELETE':
+            self.permission_classes = [IsAuthenticated]
+        else:
+            self.permission_classes = [AllowAny]
+        return super().get_permissions()
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.author != request.user:
+            return Response({'detail': 'Permission denied. You can only delete your own articles.'}, status=status.HTTP_403_FORBIDDEN)
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-
-        # 댓글을 가져오는 부분 추가
         comments = instance.comments.all()
         comment_serializer = CommentSerializer(comments, many=True)
-
         return render(request, 'Leisure_detail.html', {'article': serializer.data, 'comments': comment_serializer.data})
+    
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.author != request.user:
+            return Response({'detail': 'Permission denied. You can only update your own articles.'}, status=status.HTTP_403_FORBIDDEN)
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CookingList(BaseListView):
-    permission_classes = [AllowAny]  # 모든 요청을 허용
+    queryset = Article.objects.filter(category='Cooking')
+    serializer_class = ArticleSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            self.permission_classes = [IsAuthenticated]
+        else:
+            self.permission_classes = [AllowAny]
+        return super().get_permissions()
 
     def get(self, request, *args, **kwargs):
         articles = Article.objects.filter(category='Cooking')
@@ -153,7 +242,7 @@ class CookingList(BaseListView):
         if serializer.is_valid():
             serializer.save(author=request.user)
             new_article_id = serializer.data.get('id')
-            return redirect('articles:Cooking_detail', pk=new_article_id)  # 여기에서 패턴 이름을 수정
+            return redirect('articles:Cooking_detail', pk=new_article_id)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     @classmethod
@@ -163,18 +252,38 @@ class CookingList(BaseListView):
 class CookingDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Article.objects.filter(category='Cooking')
     serializer_class = ArticleSerializer
-    permission_classes = [AllowAny]
     lookup_field = 'pk'
+
+    def get_permissions(self):
+        if self.request.method == 'DELETE':
+            self.permission_classes = [IsAuthenticated]
+        else:
+            self.permission_classes = [AllowAny]
+        return super().get_permissions()
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.author != request.user:
+            return Response({'detail': 'Permission denied. You can only delete your own articles.'}, status=status.HTTP_403_FORBIDDEN)
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-
-        # 댓글을 가져오는 부분 추가
         comments = instance.comments.all()
         comment_serializer = CommentSerializer(comments, many=True)
-
         return render(request, 'Cooking_detail.html', {'article': serializer.data, 'comments': comment_serializer.data})
+    
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.author != request.user:
+            return Response({'detail': 'Permission denied. You can only update your own articles.'}, status=status.HTTP_403_FORBIDDEN)
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 

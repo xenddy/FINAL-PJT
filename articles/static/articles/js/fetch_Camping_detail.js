@@ -15,15 +15,13 @@ function getCookie(name) {
     return cookieValue;
 }
 
-window.onload = fetchArticleDetail;
+window.onload = async function() {
+    const articleId = window.location.pathname.split('/').filter(Boolean).pop(); // URL에서 article ID 추출
 
-async function fetchArticleDetail() {
-    const articleId = window.location.pathname.split('/').pop();
-    
     try {
         const [articleResponse, commentsResponse] = await Promise.all([
-            fetch(`${BASE_URL}api/articles/${articleId}/`),
-            fetch(`${BASE_URL}api/articles/${articleId}/comments/`)
+            fetch(`${BASE_URL}api/articles/Camping/${articleId}/`),
+            fetch(`${BASE_URL}api/articles/Camping/${articleId}/comments/`)
         ]);
 
         if (!articleResponse.ok) {
@@ -44,39 +42,101 @@ async function fetchArticleDetail() {
     } catch (error) {
         console.error('Error fetching data:', error);
     }
-}
-
-function renderArticleDetail(article) {
-    document.getElementById("article-title").innerText = article.title;
-    document.getElementById("article-content").innerText = article.content;
-    document.getElementById("article-author").innerText = article.author;
-    document.getElementById("article-created-at").innerText = article.created_at;
 
     const deleteButton = document.getElementById('deleteButton');
-    deleteButton.addEventListener('click', async () => {
-        const confirmDelete = confirm('정말로 이 게시글을 삭제하시겠습니까?');
-        if (confirmDelete) {
+    if (deleteButton) {
+        deleteButton.addEventListener('click', async () => {
+            const confirmDelete = confirm('정말로 이 게시글을 삭제하시겠습니까?');
+            if (confirmDelete) {
+                try {
+                    const csrftoken = getCookie('csrftoken'); // CSRF 토큰 가져오기
+                    const response = await fetch(`${BASE_URL}api/articles/Camping/${articleId}/`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrftoken,
+                            'Authorization': 'Bearer ' + localStorage.getItem('access_token') // JWT 토큰 포함
+                        }
+                    });
+
+                    if (!response.ok) {
+                        if (response.status === 403) {
+                            alert('삭제 권한이 없습니다.');
+                        } else {
+                            throw new Error(`Failed to delete article: ${response.statusText}`);
+                        }
+                    } else {
+                        // 삭제 후 캠핑 리스트 페이지로 이동
+                        window.location.href = '/api/articles/Camping/';
+                    }
+
+                } catch (error) {
+                    console.error('Error deleting article:', error);
+                    alert('게시글 삭제 중 오류가 발생했습니다. 다시 시도해주세요.');
+                }
+            }
+        });
+    } else {
+        console.error('Delete button not found');
+    }
+
+    const editButton = document.getElementById('editButton');
+    if (editButton) {
+        editButton.addEventListener('click', () => {
+            const articleTitle = document.getElementById('article-title').innerText.replace('제목: ', '');
+            const articleContent = document.getElementById('article-content').innerText.replace('내용: ', '');
+
+            document.getElementById('edit-title').value = articleTitle;
+            document.getElementById('edit-content').value = articleContent;
+
+            document.getElementById('edit-article-modal').style.display = 'block';
+        });
+    }
+
+    const saveEditButton = document.getElementById('saveEditButton');
+    if (saveEditButton) {
+        saveEditButton.addEventListener('click', async () => {
+            const updatedTitle = document.getElementById('edit-title').value;
+            const updatedContent = document.getElementById('edit-content').value;
+
             try {
-                const response = await fetch(`${BASE_URL}api/articles/Camping/${article.id}/`, {
-                    method: 'DELETE',
+                const csrftoken = getCookie('csrftoken');
+                const response = await fetch(`${BASE_URL}api/articles/Camping/${articleId}/`, {
+                    method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')
-                    }
+                        'X-CSRFToken': csrftoken,
+                        'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                    },
+                    body: JSON.stringify({
+                        title: updatedTitle,
+                        content: updatedContent
+                    })
                 });
-                
+
                 if (!response.ok) {
-                    throw new Error(`Failed to delete article: ${response.statusText}`);
+                    throw new Error(`Failed to update article: ${response.statusText}`);
                 }
 
-                // 삭제 후 캠핑 리스트 페이지로 이동
-                window.location.href = '/api/articles/Camping/';
+                const updatedArticle = await response.json();
+                document.getElementById('article-title').innerText = '제목: ' + updatedArticle.title;
+                document.getElementById('article-content').innerText = '내용: ' + updatedArticle.content;
+
+                document.getElementById('edit-article-modal').style.display = 'none';
 
             } catch (error) {
-                console.error('Error deleting article:', error);
+                console.error('Error updating article:', error);
+                alert('게시글 수정 권한이 없습니다.');
             }
-        }
-    });
+        });
+    }
+};
+
+function renderArticleDetail(article) {
+    document.getElementById("article-title").innerText = '제목: ' + article.title;
+    document.getElementById("article-content").innerText = '내용: ' + article.content;
+    document.getElementById("article-author").innerText = article.author;
+    document.getElementById("article-created-at").innerText = article.created_at;
 }
 
 function renderCommentsHTML(comments) {

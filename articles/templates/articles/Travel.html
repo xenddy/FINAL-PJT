@@ -88,12 +88,16 @@ nav li a:hover {
     <nav>
         <ul>
             <li class="left-justified"><a href="#" style="color: #fff;">여차저차</a></li>
-            <div class="right-justified">
-                <li><a href="{% url 'articles:Travel_list' %}">여행</a></li>
-                <li><a href="{% url 'articles:Camping_list' %}">캠핑</a></li>
-                <li><a href="{% url 'articles:Leisure_list' %}">레저</a></li>
-                <li><a href="{% url 'articles:Cooking_list' %}">요리</a></li>
-            </div>
+            {% if user.is_authenticated %}
+                <li class="right-justified"><a href="{% url 'frontend:logout' %}">로그아웃</a></li>
+            {% else %}
+                <li class="right-justified"><a href="{% url 'frontend:login' %}?next={{ request.path }}">로그인</a></li>
+                <li class="right-justified"><a href="{% url 'frontend:signup' %}?next={{ request.path }}">회원가입</a></li>
+            {% endif %}
+            <li class="right-justified"><a href="{% url 'articles:Travel_list' %}">여행</a></li>
+            <li class="right-justified"><a href="{% url 'articles:Camping_list' %}">캠핑</a></li>
+            <li class="right-justified"><a href="{% url 'articles:Leisure_list' %}">레저</a></li>
+            <li class="right-justified"><a href="{% url 'articles:Cooking_list' %}">요리</a></li>
         </ul>
     </nav>
     <h1>여행 게시판</h1>

@@ -70,14 +70,14 @@
 <body>
     <h1>게시글 작성</h1>
     
-    <form id="article-form" action="http://127.0.0.1:8000/api/articles/Camping/" method="post">
+    <form id="article-form" method="post">
         {% csrf_token %}
         <label for="title">제목:</label>
-        <input type="text" id="title" name="title">
+        <input type="text" id="title" name="title" required>
         <label for="content">내용:</label>
-        <textarea id="content" name="content"></textarea>
+        <textarea id="content" name="content" required></textarea>
         <label for="category">카테고리:</label>
-        <select id="category" name="category">
+        <select id="category" name="category" required>
             <option value="Travel">여행</option>
             <option value="Leisure">레저</option>
             <option value="Cooking">요리</option>
@@ -89,21 +89,30 @@
     <a href="#" onclick="history.back()">게시글 목록으로 돌아가기</a>
 
     <script>
-        // 폼 제출 후 자동으로 페이지 이동
         document.getElementById("article-form").addEventListener("submit", function(event) {
             event.preventDefault(); // 폼 제출 동작 막기
-            
+
             // 선택된 카테고리 값을 가져오기
             var categorySelect = document.getElementById("category");
             var category = categorySelect.options[categorySelect.selectedIndex].value;
-            
+
             // 폼 데이터 생성
             var formData = new FormData(this);
             formData.append("category", category); // 카테고리 값을 폼 데이터에 추가
+
+            // 선택된 카테고리에 따라 URL 변경
+            var actionUrl = `http://127.0.0.1:8000/api/articles/${category}/`;
+
+            var csrftoken = getCookie('csrftoken'); // CSRF 토큰 가져오기
+            var access_token = localStorage.getItem('access_token'); // JWT 액세스 토큰 가져오기
             
             // 폼 데이터를 서버로 전송
-            fetch(this.action, {
-                method: this.method,
+            fetch(actionUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Authorization': 'Bearer ' + access_token,
+                },
                 body: formData,
             }).then(response => {
                 // 서버로부터 응답을 받으면 페이지 이동
@@ -128,12 +137,29 @@
                     }
                 } else {
                     // 응답이 오류인 경우 에러 메시지 출력
-                    console.error('오류 발생:', response);
+                    response.json().then(data => {
+                        console.error('오류 발생:', data);
+                    });
                 }
             }).catch(error => {
                 console.error('네트워크 오류:', error);
             });
         });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
     </script>
 </body>
 </html>
