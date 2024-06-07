@@ -22,9 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/users/' , include('users.urls')),
     path('api/articles/', include('articles.urls')),
-<<<<<<< HEAD
-=======
     path('api/chatbot/', include('chatgpt.urls')),
     path('', include('frontend.urls')),
->>>>>>> 3e72eb9882c004c347c1189ffd51509b1fbd87c8
 ]

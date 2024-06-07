@@ -4,78 +4,98 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leisure Detail</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        h1, h2 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        p {
+            margin-bottom: 5px;
+            color: #666;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd; /* 댓글 선 추가 */
+            padding-bottom: 15px; /* 댓글 간격 추가 */
+            display: flex;
+            justify-content: space-between; /* 왼쪽과 오른쪽으로 정렬 */
+        }
+        li:last-child {
+            border-bottom: none; /* 마지막 댓글의 선 제거 */
+        }
+        .comment-content {
+            flex: 1; /* 내용은 남은 공간을 모두 차지 */
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <h1>레저 게시물 세부 정보</h1>
-    <div>
-        <h2>제목: {{ article.title }}</h2>
-        <p>내용: {{ article.content }}</p>
-        <p>작성자: {{ article.author }}</p>
-        <p>날짜: {{ article.created_at }}</p>
-        <!-- 추가적인 정보들을 필요에 따라 표시 -->
+    <div class="container">
+        <h1>캠핑 게시물 세부 정보</h1>
+        <div>
+            <h2>제목: {{ article.title }}</h2>
+            <p>내용: {{ article.content }}</p>
+            <p>작성자: {{ article.author }}</p>
+            <p>날짜: {{ article.created_at }}</p>
+            <!-- 추가적인 정보들을 필요에 따라 표시 -->
+        </div>
+<br><br>
+        <!-- 댓글 섹션 -->
+        <div>
+            <h2>댓글</h2>
+            <ul id="commentList">
+                {% for comment in comments %}
+                    <li>
+                        <div class="comment-content">
+                            <p>{{ comment.content }}</p>
+                        </div>
+                        <div class="comment-details">
+                            <p>작성자: {{ comment.user }}</p>
+                            <p>작성일자: {{ comment.created_at }}</p>
+                        </div>
+                    </li>
+                {% empty %}
+                    <li>댓글이 없습니다.</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <button onclick="goBack()">목록 보기</button>
     </div>
-
-    <!-- 댓글 섹션 -->
-    <h2>댓글</h2>
-    <ul>
-        {% for comment in comments %}
-            <li>
-                <p>{{ comment.content }}</p>
-                <p>작성자: {{ comment.user }}</p>
-                <p>작성일자: {{ comment.created_at }}</p>
-            </li>
-        {% endfor %}
-    </ul>
-
-    <!-- 수정 및 삭제 버튼 -->
-    <div>
-        <a id="editBtn" href="#">수정</a>
-        <form id="deleteForm" action="{% url 'articles:Leisure_detail' pk=article.id %}" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="_method" value="delete"> <!-- DELETE 메서드를 지정하기 위한 hidden input -->
-            <button type="submit">삭제</button>
-        </form>
-    </div>
-
-    <button onclick="goBack()">목록 보기</button>
 
     <script>
         function goBack() {
             window.history.back();
         }
-
-        // 수정 버튼 클릭 시 Travel_detail 페이지로 이동하여 수정 모드로 설정
-        document.getElementById("editBtn").addEventListener("click", function(event) {
-            event.preventDefault(); // 기본 동작 방지
-            // 현재 페이지 URL에 쿼리 매개변수 추가하여 이동
-            var editUrl = "{{ request.path }}?mode=edit";
-            window.location.href = editUrl;
-        });
-
-        function deleteArticle() {
-            // AJAX를 사용하여 DELETE 요청 보내기
-            fetch("{% url 'articles:Leisure_detail' pk=article.id %}", {
-                method: "DELETE",
-                headers: {
-                    "X-CSRFToken": "{{ csrf_token }}"
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    // 삭제 후 Travel_list 페이지로 리디렉션
-                    window.location.href = "{% url 'articles:Leisure_list' %}";
-                } else {
-                    console.error('Failed to delete article.');
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
-
-        // 삭제 버튼에 클릭 이벤트 추가
-        document.getElementById("deleteForm").addEventListener("submit", function(event) {
-            event.preventDefault(); // 폼 제출 방지
-            deleteArticle(); // 삭제 함수 호출
-        });
     </script>
 </body>
 </html>

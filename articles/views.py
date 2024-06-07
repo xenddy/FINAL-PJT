@@ -12,19 +12,22 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 class BaseListView(generics.ListCreateAPIView):
-    permission_classes = [AllowAny]  # 모든 요청을 허용
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        if request.user.is_authenticated:
-                serializer.save(author=request.user)
+        
+        serializer.save(author=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class BaseDetailView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [AllowAny]  # 모든 요청을 허용
+    permission_classes = [IsAuthenticated]
 
-class TravelList(APIView):
+    def perform_update(self, serializer):
+        serializer.save(author=self.request.user)
+
+class TravelList(BaseListView):
     permission_classes = [AllowAny]  # 모든 요청을 허용
 
     def get(self, request, *args, **kwargs):
@@ -43,36 +46,22 @@ class TravelList(APIView):
     @classmethod
     def get_new_post_page(cls, request):
         return render(request, 'newlist.html')
-    
 
 class TravelDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Article.objects.all()
+    queryset = Article.objects.filter(category='Travel')
     serializer_class = ArticleSerializer
-    permission_classes = []  # 소유자만 수정 및 삭제할 수 있도록 권한 설정
-    lookup_field = 'pk'  # URL에서 가져올 primary key 필드명 설정
+    permission_classes = [AllowAny]
+    lookup_field = 'pk'
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
 
-        # 쿼리스트링에서 mode 값을 확인하여 수정 모드인 경우에만 수정 폼 렌더링
-        mode = request.GET.get('mode')
-        if mode == 'edit':
-            return render(request, 'Travel_detail.html', {'article': serializer.data, 'edit_mode': True})
-        else:
-            return render(request, 'Travel_detail.html', {'article': serializer.data, 'edit_mode': False})
+        # 댓글을 가져오는 부분 추가
+        comments = instance.comments.all()
+        comment_serializer = CommentSerializer(comments, many=True)
 
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return render(request, 'Travel_detail.html', {'article': serializer.data, 'comments': comment_serializer.data})
 
 class CampingList(BaseListView):
     permission_classes = [AllowAny]  # 모든 요청을 허용
@@ -94,16 +83,26 @@ class CampingList(BaseListView):
     def get_new_post_page(cls, request):
         return render(request, 'newlist.html')
 
-class CampingDetail(BaseDetailView):
+class CampingDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Article.objects.filter(category='Camping')
     serializer_class = ArticleSerializer
     permission_classes = [AllowAny]
-    lookup_field = 'pk'  # URL에서 가져올 primary key 필드명 설정
+    lookup_field = 'pk'
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-        return render(request, 'Camping_detail.html', {'article': serializer.data})
+
+        # 댓글을 가져오는 부분 추가
+        comments = instance.comments.all()
+        comment_serializer = CommentSerializer(comments, many=True)
+
+        return render(request, 'Camping_detail.html', {'article': serializer.data, 'comments': comment_serializer.data})
 
 class LeisureList(BaseListView):
     permission_classes = [AllowAny]  # 모든 요청을 허용
@@ -125,16 +124,21 @@ class LeisureList(BaseListView):
     def get_new_post_page(cls, request):
         return render(request, 'newlist.html')
 
-class LeisureDetail(BaseDetailView):
+class LeisureDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Article.objects.filter(category='Leisure')
     serializer_class = ArticleSerializer
     permission_classes = [AllowAny]
-    lookup_field = 'pk'  # URL에서 가져올 primary key 필드명 설정
+    lookup_field = 'pk'
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-        return render(request, 'Leisure_detail.html', {'article': serializer.data})
+
+        # 댓글을 가져오는 부분 추가
+        comments = instance.comments.all()
+        comment_serializer = CommentSerializer(comments, many=True)
+
+        return render(request, 'Leisure_detail.html', {'article': serializer.data, 'comments': comment_serializer.data})
 
 class CookingList(BaseListView):
     permission_classes = [AllowAny]  # 모든 요청을 허용
@@ -156,40 +160,38 @@ class CookingList(BaseListView):
     def get_new_post_page(cls, request):
         return render(request, 'newlist.html')
 
-class CookingDetail(BaseDetailView):
+class CookingDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Article.objects.filter(category='Cooking')
     serializer_class = ArticleSerializer
     permission_classes = [AllowAny]
-    lookup_field = 'pk'  # URL에서 가져올 primary key 필드명 설정
+    lookup_field = 'pk'
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-        return render(request, 'Cooking_detail.html', {'article': serializer.data})
+
+        # 댓글을 가져오는 부분 추가
+        comments = instance.comments.all()
+        comment_serializer = CommentSerializer(comments, many=True)
+
+        return render(request, 'Cooking_detail.html', {'article': serializer.data, 'comments': comment_serializer.data})
 
 
 
 class CommentGetPost(APIView):
-    def get(self, request, pk):
-        article = get_object_or_404(Article, pk=pk)
+    def get(self, request, article_id):  # article_id로 수정
+        article = get_object_or_404(Article, pk=article_id)  # pk 대신 article_id 사용
         comments = article.comments.all()
         serializer = CommentSerializer(comments, many=True)
-        return render(request, 'Camping_detail.html', {'article': article, 'comments': serializer.data})
+        return Response(serializer.data)
 
-    def post(self, request, pk):
-        article = get_object_or_404(Article, pk=pk)
+    def post(self, request, article_id):  # article_id로 수정
+        article = get_object_or_404(Article, pk=article_id)  # pk 대신 article_id 사용
         serializer = CommentSerializer(data=request.data, context={'article': article, 'request': request})
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def post(self, request, pk):
-        article = get_object_or_404(Article, pk=pk)
-        serializer = CommentSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save(article=article)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
         
 class CommentPutDelete(APIView):
     def get_object(self, comment_pk):

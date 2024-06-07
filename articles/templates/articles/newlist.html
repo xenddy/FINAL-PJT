@@ -4,27 +4,89 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>게시글 작성</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+        form {
+            width: 50%;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+        input[type="text"],
+        textarea {
+            width: calc(100% - 10px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+        }
+        select {
+            width: calc(100% - 10px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007bff;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
     <h1>게시글 작성</h1>
     
-    <form id="article-form" action="http://127.0.0.1:8000/api/articles/Travel/" method="post">
+    <form id="article-form" action="http://127.0.0.1:8000/api/articles/Camping/" method="post">
         {% csrf_token %}
-        <label for="title">제목:</label><br>
-        <input type="text" id="title" name="title"><br>
-        <label for="content">내용:</label><br>
-        <textarea id="content" name="content"></textarea><br>
-        <label for="category">카테고리:</label><br>
+        <label for="title">제목:</label>
+        <input type="text" id="title" name="title">
+        <label for="content">내용:</label>
+        <textarea id="content" name="content"></textarea>
+        <label for="category">카테고리:</label>
         <select id="category" name="category">
             <option value="Travel">여행</option>
             <option value="Leisure">레저</option>
             <option value="Cooking">요리</option>
             <option value="Camping">캠핑</option>
-        </select><br>
+        </select>
         <input type="submit" value="완료">
     </form>
     
-    <a href="{% url 'articles:Travel_list' %}">게시글 목록으로 돌아가기</a>
+    <a href="#" onclick="history.back()">게시글 목록으로 돌아가기</a>
 
     <script>
         // 폼 제출 후 자동으로 페이지 이동
@@ -46,7 +108,24 @@
             }).then(response => {
                 // 서버로부터 응답을 받으면 페이지 이동
                 if (response.ok) {
-                    window.location.href = "{% url 'articles:Travel_list' %}";
+                    // 선택된 카테고리 값에 따라 해당하는 리스트 페이지로 이동
+                    switch (category) {
+                        case "Travel":
+                            window.location.href = "{% url 'articles:Travel_list' %}";
+                            break;
+                        case "Leisure":
+                            window.location.href = "{% url 'articles:Leisure_list' %}";
+                            break;
+                        case "Cooking":
+                            window.location.href = "{% url 'articles:Cooking_list' %}";
+                            break;
+                        case "Camping":
+                            window.location.href = "{% url 'articles:Camping_list' %}";
+                            break;
+                        default:
+                            console.error("잘못된 카테고리입니다.");
+                            break;
+                    }
                 } else {
                     // 응답이 오류인 경우 에러 메시지 출력
                     console.error('오류 발생:', response);

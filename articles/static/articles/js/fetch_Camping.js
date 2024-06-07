@@ -18,5 +18,3 @@ async function initialize() {
     const html = await fetchTravelArticles();
     document.getElementById("articles-container").innerHTML = html; // 받은 HTML을 컨테이너에 삽입
 }
-
-window.onload = initialize;
