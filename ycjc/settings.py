@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+SECRET_KEY = 'django-insecure-4+99yz^bz5=+qcv+(bn4!h+&kku=7^(@l=37yr_#$j_h^6c_hv'
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -87,7 +87,8 @@ ROOT_URLCONF = 'ycjc.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'articles', 'templates', 'articles')],
+        'DIRS': [os.path.join(BASE_DIR, 'articles', 'templates', 'articles'),
+                os.path.join(BASE_DIR, 'frontend', 'templates'),],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

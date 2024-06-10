@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cooking Articles</title>
+    <title>Index Page</title>
     <style>
         nav {
             width: 100%;
@@ -24,7 +24,7 @@
             float: right;
         }
         nav li {
-            display: inline-block; /* 가로로 배치되도록 설정 */
+            display: inline-block;
         }
         nav li a {
             display: block;
@@ -43,37 +43,52 @@
             margin: 0;
             padding: 0;
         }
-        h1 {
-            text-align: center;
+        .container {
+            display: flex;
+            margin: 20px;
         }
-        table {
-            width: 80%;
-            margin: 20px auto;
-            border-collapse: collapse;
+        .left {
+            flex: 1;
+            margin: 10px;
         }
-        th, td {
-            padding: 10px;
-            border: 1px solid #ddd;
-            text-align: left;
+        .center {
+            flex: 2;
+            margin: 10px;
         }
-        th {
-            background-color: #F2F2F2;
+        .right {
+            flex: 1;
+            margin: 10px;
         }
-        tbody tr:hover {
-            background-color: #F5F5F5;
+        .user-info, .category-buttons, .latest-posts {
+            background-color: #f4f4f4;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
         }
-        #new-post-btn {
+        .category-buttons button {
             display: block;
-            margin: 20px auto;
-            padding: 10px 20px;
-            background-color: #007BFF;
-            color: #fff;
-            border: none;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #fff;
+            color: #000;
+            border: 2px solid #ccc;
             border-radius: 5px;
             cursor: pointer;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
         }
-        #new-post-btn:hover {
-            background-color: #0056B3;
+        .category-buttons button:hover {
+            background-color: #f0f0f0;
+        }
+        .latest-posts h2 {
+            margin-top: 0;
+        }
+        .latest-posts div {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -93,36 +108,32 @@
             <li class="right-justified"><a href="{% url 'articles:Cooking_list' %}">요리</a></li>
         </ul>
     </nav>
-    <div>
-        <h1>요리 게시판</h1>
+    <div class="container">
+        <div class="left">
+            <div class="user-info">
+                <h3>회원 정보</h3>
+                <p>이름: {{ user.username }}</p>
+                <p>이메일: {{ user.email }}</p>
+            </div>
+            <div class="category-buttons">
+                <button id="travel-button">여행</button>
+                <button id="camping-button">캠핑</button>
+                <button id="leisure-button">레저</button>
+                <button id="cooking-button">요리</button>
+            </div>
+        </div>
+        <div class="center">
+            <div class="latest-posts">
+                <h2>최신 게시글</h2>
+                <div id="latest-posts-container">
+                    <!-- 최신 게시글이 여기에 로드됩니다. -->
+                </div>
+            </div>
+        </div>
+        <div class="right">
+            <!-- 나중에 추가할 콘텐츠 -->
+        </div>
     </div>
-    <table>
-        <thead>
-            <tr>
-                <th>Title</th>
-            </tr>
-        </thead>
-        <tbody id="articles-container">
-            {% for article in articles %}
-            <tr>
-                <td><a href="{% url 'articles:Cooking_detail' article.id %}">{{ article.title }}</a></td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="1">게시글이 없습니다.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <!-- 새 글 작성 버튼 -->
-    <button id="new-post-btn">새 글 작성</button>
-    <!-- Load JavaScript file -->
-    <script src="{% static 'articles/js/fetch_Cooking.js' %}"></script>
-    <script>
-        document.getElementById("new-post-btn").addEventListener("click", function() {
-            // 새 글 작성 페이지로 이동
-            window.location.href = "{% url 'articles:newlist' %}";
-        });
-    </script>
+    <script src="{% static 'frontend/js/index.js' %}"></script>
 </body>
 </html>
