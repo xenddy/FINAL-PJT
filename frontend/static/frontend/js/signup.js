@@ -20,7 +20,7 @@ document.getElementById('signup-form').addEventListener('submit', async function
         });
 
         console.log('Signup successful:', response.data);
-        window.location.href = 'login/';
+        window.location.href = '/login/';
     } catch (error) {
         console.error('Signup error:', error.response.data);
         alert('회원가입 실패: ' + JSON.stringify(error.response.data));

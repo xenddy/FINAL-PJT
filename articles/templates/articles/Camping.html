@@ -1,0 +1,125 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camping Articles</title>
+    <style>
+        nav {
+            width: 100%;
+            background-color: #000;
+            overflow: hidden;
+        }
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        nav li.left-justified {
+            float: left;
+        }
+        nav li.right-justified {
+            float: right;
+        }
+        nav li {
+            display: inline-block;
+        }
+        nav li a {
+            display: block;
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #fff;
+            border: 2px solid #fff;
+            border-radius: 10px;
+        }
+        nav li a:hover {
+            background-color: #fff;
+            color: #000;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #F2F2F2;
+        }
+        tbody tr:hover {
+            background-color: #F5F5F5;
+        }
+        #new-post-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #new-post-btn:hover {
+            background-color: #0056B3;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li class="left-justified"><a href="{% url 'frontend:index' %}" style="color: #fff;">여차저차</a></li>
+            {% if user.is_authenticated %}
+                <li class="right-justified"><a href="{% url 'frontend:logout' %}">로그아웃</a></li>
+            {% else %}
+                <li class="right-justified"><a href="{% url 'frontend:login' %}?next={{ request.path }}">로그인</a></li>
+                <li class="right-justified"><a href="{% url 'frontend:signup' %}?next={{ request.path }}">회원가입</a></li>
+            {% endif %}
+            <li class="right-justified"><a href="{% url 'articles:Travel_list' %}">여행</a></li>
+            <li class="right-justified"><a href="{% url 'articles:Camping_list' %}">캠핑</a></li>
+            <li class="right-justified"><a href="{% url 'articles:Leisure_list' %}">레저</a></li>
+            <li class="right-justified"><a href="{% url 'articles:Cooking_list' %}">요리</a></li>
+        </ul>
+    </nav>
+    <div>
+        <h1>캠핑 게시판</h1>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+            </tr>
+        </thead>
+        <tbody id="articles-container">
+            {% for article in articles %}
+            <tr>
+                <td><a href="{% url 'articles:Camping_detail' article.id %}">{{ article.title }}</a></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="1">게시글이 없습니다.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button id="new-post-btn">새 글 작성</button>
+    <script src="{% static 'articles/js/fetch_Camping.js' %}"></script>
+    <script>
+        document.getElementById("new-post-btn").addEventListener("click", function() {
+            window.location.href = "{% url 'articles:newlist' %}";
+        });
+    </script>
+</body>
+</html>

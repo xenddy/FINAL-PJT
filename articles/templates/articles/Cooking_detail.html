@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cooking Detail</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        h1, h2 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        p {
+            margin-bottom: 5px;
+            color: #666;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+        .comment-content {
+            flex: 1;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .comment-button {
+            background-color: transparent;
+            color: #666;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 3px 6px;
+            margin-left: 5px;
+        }
+        .comment-button:hover {
+            color: #333;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+        }
+        .modal h2 {
+            margin-top: 0;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: vertical;
+        }
+    </style>
+    {% load static %}
+</head>
+<body>
+    <div class="container">
+        <h1>캠핑 게시물 세부 정보</h1>
+        <div>
+            <h2 id="article-title">제목: {{ article.title }}</h2>
+            <p id="article-content">내용: {{ article.content }}</p>
+            <p>작성자: <span id="article-author">{{ article.author }}</span></p>
+            <p>날짜: <span id="article-created-at">{{ article.created_at }}</span></p>
+        </div>
+        <button id="deleteButton">삭제</button>
+        <button id="editButton">수정</button>
+        <button onclick="goBack()">목록 보기</button>
+        <br><br>
+        <div>
+            <h3>댓글 작성</h3>
+            <textarea id="new-comment" placeholder="댓글을 입력하세요..."></textarea>
+            <button id="submitCommentButton">댓글 작성</button>
+        </div>
+        <div>
+            <h2>댓글</h2>
+            <ul id="commentList">
+                {% for comment in comments %}
+                    <li data-comment-id="{{ comment.id }}">
+                        <div class="comment-content">
+                            <p>{{ comment.content }}</p>
+                        </div>
+                        <div class="comment-details">
+                            <p>작성자: {{ comment.user }}</p>
+                            <p>작성일자: {{ comment.created_at }}</p>
+                        </div>
+                        <div>
+                            <button class="comment-button edit-comment-button">수정</button>
+                            <button class="comment-button delete-comment-button">삭제</button>
+                        </div>
+                    </li>
+                {% empty %}
+                    <li>댓글이 없습니다.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div id="edit-article-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h2>게시글 수정</h2>
+            <label for="edit-title">제목:</label>
+            <input type="text" id="edit-title" name="title">
+            <label for="edit-content">내용:</label>
+            <textarea id="edit-content" name="content"></textarea>
+            <button id="saveEditButton">저장</button>
+        </div>
+    </div>
+
+    <div id="edit-comment-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeCommentModal">&times;</span>
+            <h2>댓글 수정</h2>
+            <label for="edit-comment-content">내용:</label>
+            <textarea id="edit-comment-content" name="content"></textarea>
+            <button id="saveCommentEditButton">저장</button>
+        </div>
+    </div>
+
+    <script src="{% static 'articles/js/fetch_Cooking_detail.js' %}"></script>
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>

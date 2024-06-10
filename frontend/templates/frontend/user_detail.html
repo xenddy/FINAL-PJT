@@ -9,8 +9,54 @@
     <script src="{% static 'frontend/js/user_detail.js' %}" defer></script>
     <script src="{% static 'frontend/js/logout.js' %}" defer></script>
     <script src="{% static 'frontend/js/follow.js' %}" defer></script>
+
+    <style>
+        nav {
+            width: 100%;
+            background-color: #000;
+            overflow: hidden;
+        }
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        nav li.left-justified {
+            float: left;
+        }
+        nav li.right-justified {
+            float: right;
+        }
+        nav li {
+            display: inline-block; /* 가로로 배치되도록 설정 */
+        }
+        nav li a {
+            display: block;
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #fff;
+            border: 2px solid #fff;
+            border-radius: 10px;
+        }
+        nav li a:hover {
+            background-color: #fff;
+            color: #000;
+        }
+    </style>
 </head>
 <body>
+    <nav>
+        <ul>
+            <li class="left-justified"><a href="#" style="color: #fff;">여차저차</a></li>
+            <li class="right-justified"><a href="{% url 'frontend:login' %}">로그인</a></li>
+            <li class="right-justified"><a href="{% url 'frontend:signup' %}">회원가입</a></li>
+            <li class="right-justified"><a href="{% url 'articles:Travel_list' %}">여행</a></li>
+            <li class="right-justified"><a href="{% url 'articles:Camping_list' %}">캠핑</a></li>
+            <li class="right-justified"><a href="{% url 'articles:Leisure_list' %}">레저</a></li>
+            <li class="right-justified"><a href="{% url 'articles:Cooking_list' %}">요리</a></li>
+        </ul>
+    </nav>
     <h1>User Detail</h1>
     <h2>{{ username }}</h2>
     <div id="user-detail">

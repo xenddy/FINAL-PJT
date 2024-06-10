@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 작성</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+        form {
+            width: 50%;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+        input[type="text"],
+        textarea {
+            width: calc(100% - 10px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+        }
+        select {
+            width: calc(100% - 10px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007bff;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>게시글 작성</h1>
+    
+    <form id="article-form" method="post">
+        {% csrf_token %}
+        <label for="title">제목:</label>
+        <input type="text" id="title" name="title" required>
+        <label for="content">내용:</label>
+        <textarea id="content" name="content" required></textarea>
+        <label for="category">카테고리:</label>
+        <select id="category" name="category" required>
+            <option value="Travel">여행</option>
+            <option value="Leisure">레저</option>
+            <option value="Cooking">요리</option>
+            <option value="Camping">캠핑</option>
+        </select>
+        <input type="submit" value="완료">
+    </form>
+    
+    <a href="#" onclick="history.back()">게시글 목록으로 돌아가기</a>
+
+    <script>
+        document.getElementById("article-form").addEventListener("submit", function(event) {
+            event.preventDefault(); // 폼 제출 동작 막기
+
+            // 선택된 카테고리 값을 가져오기
+            var categorySelect = document.getElementById("category");
+            var category = categorySelect.options[categorySelect.selectedIndex].value;
+
+            // 폼 데이터 생성
+            var formData = new FormData(this);
+            formData.append("category", category); // 카테고리 값을 폼 데이터에 추가
+
+            // 선택된 카테고리에 따라 URL 변경
+            var actionUrl = `http://127.0.0.1:8000/api/articles/${category}/`;
+
+            var csrftoken = getCookie('csrftoken'); // CSRF 토큰 가져오기
+            var access_token = localStorage.getItem('access_token'); // JWT 액세스 토큰 가져오기
+            
+            // 폼 데이터를 서버로 전송
+            fetch(actionUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Authorization': 'Bearer ' + access_token,
+                },
+                body: formData,
+            }).then(response => {
+                // 서버로부터 응답을 받으면 페이지 이동
+                if (response.ok) {
+                    // 선택된 카테고리 값에 따라 해당하는 리스트 페이지로 이동
+                    switch (category) {
+                        case "Travel":
+                            window.location.href = "{% url 'articles:Travel_list' %}";
+                            break;
+                        case "Leisure":
+                            window.location.href = "{% url 'articles:Leisure_list' %}";
+                            break;
+                        case "Cooking":
+                            window.location.href = "{% url 'articles:Cooking_list' %}";
+                            break;
+                        case "Camping":
+                            window.location.href = "{% url 'articles:Camping_list' %}";
+                            break;
+                        default:
+                            console.error("잘못된 카테고리입니다.");
+                            break;
+                    }
+                } else {
+                    // 응답이 오류인 경우 에러 메시지 출력
+                    response.json().then(data => {
+                        console.error('오류 발생:', data);
+                    });
+                }
+            }).catch(error => {
+                console.error('네트워크 오류:', error);
+            });
+        });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

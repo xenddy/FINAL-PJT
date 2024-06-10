@@ -36,6 +36,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         )
 
 
+
 class FollowSerializer(serializers.ModelSerializer):
     follower = serializers.SlugRelatedField(slug_field='username', queryset=User.objects.all())
     following = serializers.SlugRelatedField(slug_field='username', queryset=User.objects.all())
@@ -44,3 +45,4 @@ class FollowSerializer(serializers.ModelSerializer):
         model = Follow
         fields = ['id', 'follower', 'following', 'created_at']
         read_only_fields = ['id', 'created_at']
+

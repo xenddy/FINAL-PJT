@@ -20,7 +20,7 @@
 🧑‍🤝‍🧑 Development Team: Team-4
 - 이한별 :
 - 김예은 : 좋아요 및 팔로우 기능 구현
-- 정윤기 :
+- 정윤기 : 게시판 CRUD
 - 진성길 :
 
 💻 Development Environment

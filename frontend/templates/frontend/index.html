@@ -1,0 +1,139 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index Page</title>
+    <style>
+        nav {
+            width: 100%;
+            background-color: #000;
+            overflow: hidden;
+        }
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        nav li.left-justified {
+            float: left;
+        }
+        nav li.right-justified {
+            float: right;
+        }
+        nav li {
+            display: inline-block;
+        }
+        nav li a {
+            display: block;
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #fff;
+            border: 2px solid #fff;
+            border-radius: 10px;
+        }
+        nav li a:hover {
+            background-color: #fff;
+            color: #000;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            display: flex;
+            margin: 20px;
+        }
+        .left {
+            flex: 1;
+            margin: 10px;
+        }
+        .center {
+            flex: 2;
+            margin: 10px;
+        }
+        .right {
+            flex: 1;
+            margin: 10px;
+        }
+        .user-info, .category-buttons, .latest-posts {
+            background-color: #f4f4f4;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .category-buttons button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #fff;
+            color: #000;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .category-buttons button:hover {
+            background-color: #f0f0f0;
+        }
+        .latest-posts h2 {
+            margin-top: 0;
+        }
+        .latest-posts div {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li class="left-justified"><a href="{% url 'frontend:index' %}" style="color: #fff;">여차저차</a></li>
+            {% if user.is_authenticated %}
+                <li class="right-justified"><a href="{% url 'frontend:logout' %}">로그아웃</a></li>
+            {% else %}
+                <li class="right-justified"><a href="{% url 'frontend:login' %}?next={{ request.path }}">로그인</a></li>
+                <li class="right-justified"><a href="{% url 'frontend:signup' %}?next={{ request.path }}">회원가입</a></li>
+            {% endif %}
+            <li class="right-justified"><a href="{% url 'articles:Travel_list' %}">여행</a></li>
+            <li class="right-justified"><a href="{% url 'articles:Camping_list' %}">캠핑</a></li>
+            <li class="right-justified"><a href="{% url 'articles:Leisure_list' %}">레저</a></li>
+            <li class="right-justified"><a href="{% url 'articles:Cooking_list' %}">요리</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <div class="left">
+            <div class="user-info">
+                <h3>회원 정보</h3>
+                <p>이름: {{ user.username }}</p>
+                <p>이메일: {{ user.email }}</p>
+            </div>
+            <div class="category-buttons">
+                <button id="travel-button">여행</button>
+                <button id="camping-button">캠핑</button>
+                <button id="leisure-button">레저</button>
+                <button id="cooking-button">요리</button>
+            </div>
+        </div>
+        <div class="center">
+            <div class="latest-posts">
+                <h2>최신 게시글</h2>
+                <div id="latest-posts-container">
+                    <!-- 최신 게시글이 여기에 로드됩니다. -->
+                </div>
+            </div>
+        </div>
+        <div class="right">
+            <!-- 나중에 추가할 콘텐츠 -->
+        </div>
+    </div>
+    <script src="{% static 'frontend/js/index.js' %}"></script>
+</body>
+</html>
