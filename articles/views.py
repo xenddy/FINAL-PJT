@@ -8,8 +8,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import (
     CommentSerializer,ArticleSerializer,
 )
-from django.http import HttpResponseRedirect
-from django.urls import reverse
+from django.http import JsonResponse
 
 class BaseListView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
@@ -339,3 +338,10 @@ class LikeCreate(generics.CreateAPIView):
         like = get_object_or_404(Like, user=user, article=article)
         like.delete()
         return Response({'detail': 'Like removed successfully.'}, status=status.HTTP_204_NO_CONTENT)
+    
+class LatestPosts(APIView):
+    def get(self, request, category):
+        articles = Article.objects.filter(category=category).order_by('-created_at')[:2]
+        serializer = ArticleSerializer(articles, many=True)
+        return Response(serializer.data)
+    

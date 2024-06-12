@@ -6,6 +6,10 @@ from rest_framework.views import APIView
 import logging
 from django.http import JsonResponse
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.shortcuts import render
+from rest_framework.response import Response
+from articles.models import Article
+from articles.serializers import ArticleSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -50,3 +54,6 @@ class UserEditView(APIView):
     def get(self, request, username):
         user = get_object_or_404(User, username=username)
         return render(request, 'frontend/useredit.html', {'user': user})
+
+def index(request):
+    return render(request, 'frontend/index.html')

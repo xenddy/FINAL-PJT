@@ -18,10 +18,10 @@
 - 발표
 
 🧑‍🤝‍🧑 Development Team: Team-4
-- 이한별 :
+- 이한별 : 유저CRUD, 댓글CRUD, OPENAI - ChatGPT, DB(Postgresql, Docker)
 - 김예은 : 좋아요 및 팔로우 기능 구현
 - 정윤기 : 게시판 CRUD
-- 진성길 :
+
 
 💻 Development Environment
 - Programming Language :   <img src="https://img.shields.io/badge/python-3776AB?style=for-the-badge&logo=python&logoColor=white"> 

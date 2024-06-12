@@ -14,6 +14,7 @@ urlpatterns = [
     path('Cooking/', views.CookingList.as_view(), name='Cooking_list'),
     path('Cooking/<int:pk>/', views.CookingDetail.as_view(), name='Cooking_detail'),
     path('<int:article_id>/comments/', views.CommentGetPost.as_view(), name='comments-list'),
-    path('comments/<int:comment_pk>/', views.CommentPutDelete.as_view(), name='comments-detail'),  # 'comments-create' -> 'comments-detail'
+    path('comments/<int:comment_pk>/', views.CommentPutDelete.as_view(), name='comments-detail'),
     path('like/<int:article_id>/', views.LikeCreate.as_view(), name='like-create'),
+    path('latest/<str:category>/', views.LatestPosts.as_view(), name='latest_posts'),
 ]

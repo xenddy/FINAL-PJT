@@ -80,7 +80,7 @@
 <body>
     <nav>
         <ul>
-            <li class="left-justified"><a href="#" style="color: #fff;">여차저차</a></li>
+            <li class="left-justified"><a href="{% url 'frontend:index' %}" style="color: #fff;">여차저차</a></li>
             {% if user.is_authenticated %}
                 <li class="right-justified"><a href="{% url 'frontend:logout' %}">로그아웃</a></li>
             {% else %}

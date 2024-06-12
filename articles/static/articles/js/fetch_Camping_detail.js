@@ -180,45 +180,72 @@ window.onload = async function() {
 
     document.addEventListener('click', async function(event) {
         if (event.target.classList.contains('delete-comment-button')) {
-            const commentId = event.target.closest('li').dataset.commentId;
-
-            try {
-                const csrftoken = getCookie('csrftoken');
-                const response = await fetch(`${BASE_URL}api/articles/comments/${commentId}/`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrftoken,
-                        'Authorization': 'Bearer ' + localStorage.getItem('access_token')
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Failed to delete comment: ${response.statusText}`);
+            const commentLi = event.target.closest('li');
+            if (commentLi) {
+                const commentId = commentLi.dataset.commentId || window.location.pathname.split('/').filter(Boolean).pop();
+                if (!commentId) {
+                    console.error('Error: commentId is missing or empty.');
+                    return;
                 }
-
-                event.target.closest('li').remove();
-
-            } catch (error) {
-                console.error('Error deleting comment:', error);
-                alert('댓글 삭제 중 오류가 발생했습니다. 다시 시도해주세요.');
+                console.log('Deleting comment with ID:', commentId);  // Debugging
+    
+                try {
+                    const csrftoken = getCookie('csrftoken');
+                    const response = await fetch(`${BASE_URL}api/articles/comments/${commentId}/`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrftoken,
+                            'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                        }
+                    });
+    
+                    if (!response.ok) {
+                        throw new Error(`Failed to delete comment: ${response.statusText}`);
+                    }
+    
+                    commentLi.remove();
+    
+                } catch (error) {
+                    console.error('Error deleting comment:', error);
+                    alert('댓글 삭제 중 오류가 발생했습니다. 다시 시도해주세요.');
+                }
+            } else {
+                console.error('No parent <li> element found.');
             }
         }
-
+    
         if (event.target.classList.contains('edit-comment-button')) {
-            const commentId = event.target.closest('li').dataset.commentId;
-            const commentContent = event.target.closest('li').querySelector('.comment-content p').innerText;
-
-            document.getElementById('edit-comment-content').value = commentContent;
-            document.getElementById('saveCommentEditButton').dataset.commentId = commentId;
-            document.getElementById('edit-comment-modal').style.display = 'block';
+            const commentLi = event.target.closest('li');
+            if (commentLi) {
+                const commentId = commentLi.dataset.commentId || window.location.pathname.split('/').filter(Boolean).pop();
+                if (!commentId) {
+                    console.error('Error: commentId is missing or empty.');
+                    return;
+                }
+                const commentContent = commentLi.querySelector('.comment-content p').innerText;
+    
+                console.log('Editing comment with ID:', commentId);  // Debugging
+    
+                document.getElementById('edit-comment-content').value = commentContent;
+                document.getElementById('saveCommentEditButton').dataset.commentId = commentId;
+                document.getElementById('edit-comment-modal').style.display = 'block';
+            } else {
+                console.error('No parent <li> element found.');
+            }
         }
     });
-
+    
     document.getElementById('saveCommentEditButton').addEventListener('click', async function() {
-        const commentId = this.dataset.commentId;
+        const commentId = this.dataset.commentId || window.location.pathname.split('/').filter(Boolean).pop();
+        if (!commentId) {
+            console.error('Error: commentId is missing or empty.');
+            return;
+        }
         const updatedContent = document.getElementById('edit-comment-content').value;
-
+    
+        console.log('Saving edit for comment ID:', commentId);  // Debugging
+    
         try {
             const csrftoken = getCookie('csrftoken');
             const response = await fetch(`${BASE_URL}api/articles/comments/${commentId}/`, {
@@ -230,22 +257,22 @@ window.onload = async function() {
                 },
                 body: JSON.stringify({ content: updatedContent })
             });
-
+    
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error('Error response:', errorText);
                 throw new Error(`Failed to update comment: ${response.statusText}`);
             }
-
+    
             const updatedComment = await response.json();
             const commentElement = document.querySelector(`li[data-comment-id='${commentId}'] .comment-content p`);
             commentElement.innerText = updatedComment.content;
-
+    
             document.getElementById('edit-comment-modal').style.display = 'none';
-
+    
         } catch (error) {
             console.error('Error updating comment:', error);
             alert('댓글 수정 중 오류가 발생했습니다. 다시 시도해주세요.');
         }
     });
-}
+}   
