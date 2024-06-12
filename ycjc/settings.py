@@ -13,10 +13,17 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 import os
-os.environ.get("key")
+import environ
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# 기본 디렉터리 설정하기
 BASE_DIR = Path(__file__).resolve().parent.parent
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
+# 환경 설정 로드하기
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+
+# 환경 변수 가져오기
+os.environ.get("key")
 
 
 # Quick-start development settings - unsuitable for production
@@ -27,14 +34,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     "3.38.93.229",
     "127.0.0.1",
     "localhost",
 ]
-
 
 # Application definition
 
