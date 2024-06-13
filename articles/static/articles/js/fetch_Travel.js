@@ -1,4 +1,4 @@
-const BASE_URL = "http://127.0.0.1:8000/";
+const BASE_URL = 'http://3.38.93.229/';
 
 async function fetchTravelArticles() {
     const response = await fetch(`${BASE_URL}api/articles/Travel/`);

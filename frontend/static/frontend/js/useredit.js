@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const password2 = document.getElementById('password2').value;
 
         try {
-            const response = await axios.put(`http://127.0.0.1:8000/api/users/${username}/`, {
+            const response = await axios.put(`http://3.38.93.229/api/users/${username}/`, {
                 first_name: firstName,
                 password,
                 password2
